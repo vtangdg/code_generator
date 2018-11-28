@@ -1,4 +1,4 @@
-package com.degang.code_generator;
+package com.degang.codegenerator;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

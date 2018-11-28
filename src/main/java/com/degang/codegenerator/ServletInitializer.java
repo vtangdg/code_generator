@@ -1,4 +1,4 @@
-package com.degang.code_generator;
+package com.degang.codegenerator;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;

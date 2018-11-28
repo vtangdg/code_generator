@@ -1,12 +1,16 @@
-package com.degang.code_generator;
+package com.degang.codegenerator;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+@Slf4j
 public class CodeGeneratorApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(CodeGeneratorApplication.class, args);
+
+        log.info("test");
     }
 }
