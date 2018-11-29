@@ -20,7 +20,7 @@ public class FileUtil {
      * @param filepath 文件路径
      * @return 返回List，如果传入的路径不对或扩展名为空，则返回空List。
      */
-    public static List<String> listFileDirector(String filepath) {
+    public static List<String> listOneDepthFileDirectory(String filepath) {
         if (StringUtils.isEmpty(filepath)) {
             return Collections.emptyList();
         }
@@ -46,12 +46,12 @@ public class FileUtil {
      * @param ext 扩展名 空则不限定扩展名
      * @return 返回List，如果传入的路径不对，则返回空List；如果扩展名为空则返回所有文件
      */
-    public static List<String> listFileWithExt(String filepath, String ext) {
+    public static List<String> listOndDepthFileWithExt(String filepath, String ext) {
         if (StringUtils.isEmpty(filepath)) {
             return Collections.emptyList();
         }
 
-        String anothExt = ext == null ? "" : ext;
+        String validExt = ext == null ? "" : ext;
         File file = new File(filepath);
         if (!file.exists() || !file.isDirectory()) {
             return Collections.emptyList();
@@ -61,18 +61,18 @@ public class FileUtil {
         if (files == null || files.length == 0) {
             return Collections.emptyList();
         }
-
-        return Arrays.stream(files).filter(item -> ("".equals(anothExt) || anothExt.equals(getExt(item.getName())) && item.isFile())).map(File::getName).collect(Collectors.toList());
+        return Arrays.stream(files)
+                .filter(item -> ("".equals(validExt) || validExt.equals(getExt(item.getName()))) && item.isFile()).map(File::getName).collect(Collectors.toList());
     }
 
     /**
      * 获取文件扩展名<br>
      * 例如：<br>
-     * <ul></li>
-     * <li>test.vm -> .vm</li>
-     * <li>test -> ""</li>
-     * <li>null -> ""</li>
-     * <li>"" -> ""</li>
+     * <ul>
+     *  <li>test.vm -> .vm</li>
+     *  <li>test -> ""</li>
+     *  <li>null -> ""</li>
+     *  <li>"" -> ""</li>
      * </ul>
      *
      * @param filename 文件路径
@@ -92,11 +92,11 @@ public class FileUtil {
     /**
      * 获取去除后缀名后的文件名
      * 例如：<br>
-     * <ul></li>
-     * <li>test.vm -> test</li>
-     * <li>test -> test</li>
-     * <li>null -> ""</li>
-     * <li>"" -> ""</li>
+     * <ul>
+     *  <li>test.vm -> test</li>
+     *  <li>test -> test</li>
+     *  <li>null -> ""</li>
+     *  <li>"" -> ""</li>
      * </ul>
      *
      * @param filename 文件名
@@ -170,8 +170,8 @@ public class FileUtil {
     /**
      * 复制文件夹
      *
-     * @param sourceDir
-     * @param targetDir
+     * @param sourceDir 源目录
+     * @param targetDir 目标目录
      * @return true or false
      */
     public static boolean copyDirectory(String sourceDir, String targetDir) {
@@ -218,7 +218,7 @@ public class FileUtil {
      * 删除目录下所有指定后缀的文件名
      *
      * @param filepath 文件目录路径
-     * @param ext
+     * @param ext 后缀名
      * @throws IOException
      */
     public static void delExtFile(String filepath, String ext) {
@@ -246,27 +246,79 @@ public class FileUtil {
                 } else {
                     // 判断扩展名进行删除
                     if (delFile[i] != null && !StringUtils.isEmpty(delFile[i].getName()) && delFile[i].getName().endsWith(ext)) {
-                        delFile[i].delete();//删除文件
+                        delFile[i].delete();
                     }
                 }
             }
         }
     }
 
+    public static String findLine(String filename, String startWith) {
+        if (StringUtils.isEmpty(filename)) {
+            return "";
+        }
+        File file = new File(filename);
+        if (!file.exists() || !file.isFile()) {
+            log.error("文件不存在：{}", filename);
+            return "";
+        }
+        FileReader reader = null;
+        BufferedReader bufferedReader = null;
+
+        try {
+            reader = new FileReader(file);
+            bufferedReader = new BufferedReader(reader);
+
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (line.startsWith(startWith)) {
+                    return line;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            log.error("文件未找到:{}", filename);
+            return "";
+        } catch (Exception e) {
+            log.error("filename:{}", filename, e);
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (Exception e) {
+                    log.error("", e);
+                }
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    log.error("", e);
+                }
+            }
+        }
+
+        return "";
+    }
+
 
 
     public static void main(String[] args) {
         String path = ClassLoader.getSystemResource("").getPath();
+        String packagePath = "src/main/java/com/degang/codegenerator";
 
-        System.out.println("abc".lastIndexOf("a"));
+        // System.out.println("abc".lastIndexOf("a"));
 
         try {
-            System.out.println( ClassLoader.getSystemResource(".").getPath());
+            System.out.println( ClassLoader.getSystemResource("").getPath());
             System.out.println(new File("").getCanonicalFile());
             System.out.println(new File("").getAbsolutePath());
 
+            File file = new File("src/main/java/com/degang/codegenerator/util" + File.separator + "FileUtil.java");
+            System.out.println(file.isFile());
+            System.out.println(listOndDepthFileWithExt(path, null));
 
-            System.out.println(listFileDirector(path));
+
+            System.out.println(listOneDepthFileDirectory(path));
         } catch (IOException e) {
             e.printStackTrace();
         }
