@@ -91,6 +91,19 @@ public class FilesUtil {
         return path.toString().substring(i);
     }
 
+    /**
+     * 获取去除后缀名后的文件名
+     * 例如：<br>
+     * <ul>
+     *  <li>test.vm -> test</li>
+     *  <li>test -> test</li>
+     *  <li>null -> ""</li>
+     *  <li>"" -> ""</li>
+     * </ul>
+     *
+     * @param filename 文件名
+     * @return 如果传入的文件名为空则返回空字符串"",如果文件名没有扩展名，则返回原文件名。
+     */
     public static String getFilenameWithoutExt(String filename) {
         if (StringUtils.isEmpty(filename)) {
             return "";
@@ -101,6 +114,22 @@ public class FilesUtil {
         }
 
         return filename.substring(0, i);
+    }
+
+    /**
+     * 根据传入的路径创建文件夹,如果路径不存在则创建之。
+     *
+     * @param filepath 路径
+     * @return true or false
+     */
+    public static boolean mkDirs(String filepath) {
+        try {
+            Files.createDirectories(Paths.get(filepath));
+        } catch (IOException e) {
+            log.error("", e);
+            return false;
+        }
+        return true;
     }
 
 
